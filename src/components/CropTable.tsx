@@ -79,8 +79,8 @@ export default function CropTable() {
 
   const rows: IRow[] = useMemo(() => {
     return crops.map((c): IRow => {
-      const o = objects.find((b) => b["Object Id"] == c["Object Id"]);
-      const h = objects.find((b) => b["Object Id"] == c["Index Of Harvest"]);
+      const o = objects.find((b) => b["Object Id"] === c["Object Id"]);
+      const h = objects.find((b) => b["Object Id"] === c["Index Of Harvest"]);
       return {
         ...c,
         ...o,
