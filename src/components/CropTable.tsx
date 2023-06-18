@@ -113,16 +113,25 @@ export default function CropTable() {
   }, [crops, objects]);
 
   return (
-    <div style={{ width: "100%", height: "90vh" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "grid",
+        gridTemplateRows: "auto 1fr",
+      }}
+    >
       <h3>Crop Table Two</h3>
-      {rows && (
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          getRowId={(row) => row.Id}
-          density="compact"
-        />
-      )}
+      <div style={{ minHeight: 0 }}>
+        {rows && (
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={(row) => row.Id}
+            density="compact"
+          />
+        )}
+      </div>
     </div>
   );
 }
