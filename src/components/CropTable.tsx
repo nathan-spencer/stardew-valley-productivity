@@ -1,16 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import stardewService from "../service/stardewService";
 import { ICrop } from "../interface/ICrop";
 import IObject from "../interface/IObject";
 import SeasonSelect from "./SeasonSelect";
-import { TextField } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
+import ISeedSource from "../interface/ISeedSource";
 
 interface IRow {
   Id: number;
   Seed: string;
   Harvest: string;
   Price: number;
+  Source: string;
   Sell: number;
   Edibility?: string;
   Type?: string;
@@ -39,6 +41,7 @@ const columns: GridColDef[] = [
   { field: "Seed", width: 160 },
   { field: "Harvest", width: 160 },
   { field: "Price" },
+  { field: "Source" },
   { field: "Sell" },
   // { field: "Edibility", width: 60 }, //always -300
   // { field: "Type" }, //always Seeds
@@ -88,7 +91,8 @@ const columns: GridColDef[] = [
   {
     field: "XP/D",
     description: "Experience per Day",
-    valueGetter: ({ row: p }) => (p.XP * p.Harvests) / p.TotalGrowthDays,
+    valueGetter: ({ row: p }) =>
+      p.TotalGrowthDays <= 0 ? 0 : (p.XP * p.Harvests) / p.TotalGrowthDays,
   },
   {
     field: "XP/G",
@@ -100,8 +104,17 @@ const columns: GridColDef[] = [
 export default function CropTable() {
   const [crops, setCrops] = useState<ICrop[]>([]);
   const [objects, setObjects] = useState<IObject[]>([]);
-  const [season, setSeason] = useState<string>("");
+  const [season, setSeason] = useState<string>("Spring");
+  const [price, setPrice] = useState<string>("Source");
   const [day, setDay] = useState<number>(1);
+  const [sources, setSources] = useState<ISeedSource[]>([]);
+
+  const fetchSources = useCallback(async () => {
+    await stardewService.getSeedSources().then((r) => setSources(r));
+  }, []);
+  useEffect(() => {
+    fetchSources();
+  }, [fetchSources]);
 
   useEffect(() => {
     (async () => {
@@ -122,14 +135,19 @@ export default function CropTable() {
       .map((c): IRow => {
         const o = objects.find((b) => b["Object Id"] === c["Object Id"]);
         const h = objects.find((b) => b["Object Id"] === c["Index Of Harvest"]);
+        const s = sources.find((s) => s.ObjectId === Number(c["Object Id"]));
         return {
           ...c,
           ...o,
           Id: Number(c["Object Id"]),
           Seed: o?.Name ?? "",
           Harvest: h?.Name ?? "",
-          Price: Number(o?.Price) * 2, //temp fix. Need to have a better way for getting seed cost for various seed sources.
-          Sell: Number(h?.Price),
+          Price:
+            price === "Source"
+              ? s?.Price ?? 0
+              : Number(o?.Price) ?? s?.Price ?? 0,
+          Source: s?.Source ?? "",
+          Sell: s?.Sell ?? 0,
           // Food: o?.["Food and Drink"] ?? "", //Blank
           GrowthDays: [
             c["Days in Stage 1 Growth"],
@@ -202,7 +220,7 @@ export default function CropTable() {
           TotalGrowthDays: gd,
         };
       });
-  }, [crops, objects, season, day]);
+  }, [crops, objects, season, day, sources, price]);
 
   const handleDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDay = Number(e.target.value);
@@ -227,8 +245,7 @@ export default function CropTable() {
         overflow: "hidden",
       }}
     >
-      <div style={{ display: "flex", margin: "20px 10px 5px", gap: "20px" }}>
-        <h1 style={{ margin: "0px" }}>Crop Table</h1>
+      <div style={{ display: "flex", margin: "15px 0px 5px", gap: "20px" }}>
         <SeasonSelect season={season} onChange={(ns) => setSeason(ns)} />
         <TextField
           type="number"
@@ -237,6 +254,16 @@ export default function CropTable() {
           value={day}
           onChange={handleDayChange}
           sx={{ width: "100px" }}
+        />
+        <Autocomplete
+          value={price}
+          onChange={(_e: any, newValue: string | null) => {
+            setPrice(newValue ?? "");
+          }}
+          options={["Source", "Seed"]}
+          sx={{ width: 200 }}
+          renderInput={(params: any) => <TextField {...params} label="Price" />}
+          size="small"
         />
       </div>
       <div style={{ minHeight: 0, overflow: "auto" }}>
@@ -250,6 +277,8 @@ export default function CropTable() {
                 columnVisibilityModel: {
                   Id: false,
                   Description: false,
+                  ExtraHarvestChance: false,
+                  "Xtra #": false,
                 },
               },
             }}

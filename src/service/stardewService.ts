@@ -1,7 +1,9 @@
 import { ICrop } from "../interface/ICrop";
 import IObject from "../interface/IObject";
+import ISeedSource from "../interface/ISeedSource";
 import Crops from "./Crops";
 import Objects from "./Objects";
+import SeedSources from "./SeedSources";
 
 async function getCrops(): Promise<ICrop[]> {
   return Crops;
@@ -9,6 +11,10 @@ async function getCrops(): Promise<ICrop[]> {
 
 async function getObjects(): Promise<IObject[]> {
   return Objects;
+}
+
+async function getSeedSources(): Promise<ISeedSource[]> {
+  return SeedSources;
 }
 /*
 async function getSeedSources() {
@@ -40,6 +46,6 @@ async function getSeedSources() {
 }
 */
 
-const stardewService = { getCrops, getObjects };
+const stardewService = { getCrops, getObjects, getSeedSources };
 
 export default stardewService;
