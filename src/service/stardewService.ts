@@ -1,4 +1,3 @@
-import Papa from "papaparse";
 import { ICrop } from "../interface/ICrop";
 import IObject from "../interface/IObject";
 import Crops from "./Crops";

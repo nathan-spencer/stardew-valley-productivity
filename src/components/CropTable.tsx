@@ -172,7 +172,7 @@ export default function CropTable() {
         let rd = 28 - d;
         //Add days for multi-season crops.
         //If all 4 seasons set to 4*28
-        if (r.GrowthSeasons.length == 4) rd = 4 * 28;
+        if (r.GrowthSeasons.length === 4) rd = 4 * 28;
         else if (r.GrowthSeasons.length > 1) {
           //calculate remaining seasons
           let rs = r.GrowthSeasons.length - (r.GrowthSeasons.indexOf(s) + 1);
