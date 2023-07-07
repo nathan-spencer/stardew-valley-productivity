@@ -3,7 +3,7 @@ import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 import stardewService from "../service/stardewService";
 import { ICrop } from "../interface/ICrop";
 import IObject from "../interface/IObject";
-import SeasonSelect from "./SeasonSelect";
+import SeasonSelect, { Season } from "./SeasonSelect";
 import { Autocomplete, TextField } from "@mui/material";
 import ISeedSource from "../interface/ISeedSource";
 
@@ -101,11 +101,14 @@ const columns: GridColDef[] = [
   },
 ];
 
+type PriceType = "Source" | "Seed" | "Seed Maker";
+const priceTypes: PriceType[] = ["Source", "Seed", "Seed Maker"];
+
 export default function CropTable() {
   const [crops, setCrops] = useState<ICrop[]>([]);
   const [objects, setObjects] = useState<IObject[]>([]);
-  const [season, setSeason] = useState<string>("Spring");
-  const [price, setPrice] = useState<string>("Source");
+  const [season, setSeason] = useState<Season>("Spring");
+  const [price, setPrice] = useState<PriceType>("Source");
   const [day, setDay] = useState<number>(1);
   const [sources, setSources] = useState<ISeedSource[]>([]);
 
@@ -131,21 +134,33 @@ export default function CropTable() {
 
   const rows: IRow[] = useMemo(() => {
     return crops
-      .filter((c) => c["Growth Seasons"].includes(season.toLowerCase()))
+      .filter(
+        (c) =>
+          season.toLowerCase() === "greenhouse" ||
+          c["Growth Seasons"].includes(season.toLowerCase())
+      )
       .map((c): IRow => {
         const o = objects.find((b) => b["Object Id"] === c["Object Id"]);
         const h = objects.find((b) => b["Object Id"] === c["Index Of Harvest"]);
         const s = sources.find((s) => s.ObjectId === Number(c["Object Id"]));
+        let p = s?.Price ?? 0;
+        switch (price) {
+          case "Seed":
+            p = Number(o?.Price) ?? p;
+            break;
+          case "Seed Maker":
+            p =
+              o?.["Object Id"] === h?.["Object Id"]
+                ? Number(h?.Price) ?? p
+                : (s?.Sell ?? 0) / 2;
+        }
         return {
           ...c,
           ...o,
           Id: Number(c["Object Id"]),
           Seed: o?.Name ?? "",
           Harvest: h?.Name ?? "",
-          Price:
-            price === "Source"
-              ? s?.Price ?? 0
-              : Number(o?.Price) ?? s?.Price ?? 0,
+          Price: p,
           Source: s?.Source ?? "",
           Sell: s?.Sell ?? 0,
           // Food: o?.["Food and Drink"] ?? "", //Blank
@@ -190,7 +205,7 @@ export default function CropTable() {
         let rd = 28 - d;
         //Add days for multi-season crops.
         //If all 4 seasons set to 4*28
-        if (r.GrowthSeasons.length === 4) rd = 4 * 28;
+        if (r.GrowthSeasons.length === 4 || s === "greenhouse") rd = 4 * 28;
         else if (r.GrowthSeasons.length > 1) {
           //calculate remaining seasons
           let rs = r.GrowthSeasons.length - (r.GrowthSeasons.indexOf(s) + 1);
@@ -257,10 +272,10 @@ export default function CropTable() {
         />
         <Autocomplete
           value={price}
-          onChange={(_e: any, newValue: string | null) => {
-            setPrice(newValue ?? "");
+          onChange={(_e: any, newValue: PriceType | null) => {
+            setPrice(newValue ?? "Source");
           }}
-          options={["Source", "Seed"]}
+          options={priceTypes}
           sx={{ width: 200 }}
           renderInput={(params: any) => <TextField {...params} label="Price" />}
           size="small"
@@ -279,6 +294,7 @@ export default function CropTable() {
                   Description: false,
                   ExtraHarvestChance: false,
                   "Xtra #": false,
+                  "XP/G": false,
                 },
               },
             }}

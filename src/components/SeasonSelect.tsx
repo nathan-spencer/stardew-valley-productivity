@@ -1,10 +1,24 @@
 import { Autocomplete, TextField } from "@mui/material";
 
+export type Season =
+  | ""
+  | "Spring"
+  | "Summer"
+  | "Fall"
+  | "Winter"
+  | "Greenhouse";
 interface SeasonSelectProps {
-  season?: string;
-  onChange(season: string): void;
+  season?: Season;
+  onChange(season: Season): void;
 }
-const seasons = ["", "Spring", "Summer", "Fall", "Winter"];
+const seasons: Season[] = [
+  "",
+  "Spring",
+  "Summer",
+  "Fall",
+  "Winter",
+  "Greenhouse",
+];
 
 export default function SeasonSelect(props: SeasonSelectProps): JSX.Element {
   const { season, onChange } = props;
@@ -14,7 +28,7 @@ export default function SeasonSelect(props: SeasonSelectProps): JSX.Element {
   return (
     <Autocomplete
       value={value}
-      onChange={(_e: any, newValue: string | null) => {
+      onChange={(_e: any, newValue: Season | null) => {
         onChange(newValue ?? "");
       }}
       options={seasons}
