@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.js": "/stardew-valley-productivity/static/js/main.292706be.js",
+    "main.js": "/stardew-valley-productivity/static/js/main.841ce3f2.js",
     "static/js/787.179fc4e3.chunk.js": "/stardew-valley-productivity/static/js/787.179fc4e3.chunk.js",
     "index.html": "/stardew-valley-productivity/index.html",
-    "main.292706be.js.map": "/stardew-valley-productivity/static/js/main.292706be.js.map",
+    "main.841ce3f2.js.map": "/stardew-valley-productivity/static/js/main.841ce3f2.js.map",
     "787.179fc4e3.chunk.js.map": "/stardew-valley-productivity/static/js/787.179fc4e3.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/main.292706be.js"
+    "static/js/main.841ce3f2.js"
   ]
 }
