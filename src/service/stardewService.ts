@@ -16,6 +16,10 @@ async function getObjects(): Promise<IObject[]> {
 async function getSeedSources(): Promise<ISeedSource[]> {
   return SeedSources;
 }
+
+function hiddenColumns(): string[] {
+  return sessionStorage.getItem("crop_table_hidden_columns")?.split(",") ?? [];
+}
 /*
 async function getSeedSources() {
   //Price in Objects.csv are what the seeds SELL for. Seeds general cost 2x what they sell for with the following exceptions.
