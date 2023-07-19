@@ -3,7 +3,7 @@ import CropTable from "./components/CropTable";
 
 const darkTheme = createTheme({
   palette: {
-    mode: "dark",
+    // mode: "dark",
   },
 });
 

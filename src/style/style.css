@@ -1,0 +1,18 @@
+.container {
+  /* width: fit-content; */
+  /* text-align: center; */
+  background: #FAD08F;
+  margin: 12px;
+  padding: 6px;
+  font: bold 20px "Courier New", monospace;
+  box-shadow:
+    0 0 0 3px #DDAE79,
+    0 0 0 6px #A75326,
+    0 0 0 9px #D17E34,
+    0 0 0 12px #562E2D;
+  height: calc(100vh - 24px);
+  /* height: 100vh; */
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}

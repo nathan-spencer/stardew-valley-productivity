@@ -6,6 +6,7 @@ import IObject from "../interface/IObject";
 import SeasonSelect, { Season } from "./SeasonSelect";
 import { Autocomplete, TextField } from "@mui/material";
 import ISeedSource from "../interface/ISeedSource";
+import "../style/style.css";
 
 interface IRow {
   Id: number;
@@ -251,15 +252,7 @@ export default function CropTable() {
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        display: "grid",
-        gridTemplateRows: "auto 1fr",
-        overflow: "hidden",
-      }}
-    >
+    <div className="container">
       <div style={{ display: "flex", margin: "15px 0px 5px", gap: "20px" }}>
         <SeasonSelect season={season} onChange={(ns) => setSeason(ns)} />
         <TextField
