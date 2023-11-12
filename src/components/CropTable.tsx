@@ -4,9 +4,19 @@ import stardewService from "../service/stardewService";
 import { ICrop } from "../interface/ICrop";
 import IObject from "../interface/IObject";
 import SeasonSelect, { Season } from "./SeasonSelect";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, Box, TextField, Tooltip } from "@mui/material";
 import ISeedSource from "../interface/ISeedSource";
 import "../style/style.css";
+import {
+  AgricultureOutlined,
+  Brightness4Outlined,
+  DateRangeOutlined,
+  EventRepeatOutlined,
+  MonetizationOnOutlined,
+  Numbers,
+  ShoppingBagOutlined,
+  TipsAndUpdatesOutlined,
+} from "@mui/icons-material";
 
 interface IRow {
   Id: number;
@@ -37,32 +47,75 @@ interface IRow {
   //only reward experience for the first product and do not offer any extra experience for the multiples
   XP: number;
 }
+
+const numberColumnProps: Pick<
+  GridColDef,
+  "width" | "align" | "headerAlign" | "hideSortIcons" | "disableColumnMenu"
+> = {
+  width: 0,
+  align: "right",
+  headerAlign: "right",
+  hideSortIcons: true,
+  disableColumnMenu: true,
+};
+
 const columns: GridColDef[] = [
   { field: "Id", width: 0 }, //only show when needed
   { field: "Seed", width: 160 },
   { field: "Harvest", width: 160 },
-  { field: "Price" },
+  {
+    ...numberColumnProps,
+    field: "Price",
+    width: 60,
+    renderHeader: () => (
+      <Tooltip title="Price">
+        <ShoppingBagOutlined />
+      </Tooltip>
+    ),
+  },
   { field: "Source" },
-  { field: "Sell" },
+  {
+    ...numberColumnProps,
+    field: "Sell",
+    renderHeader: () => (
+      <Tooltip title="Sell Price">
+        <MonetizationOnOutlined />
+      </Tooltip>
+    ),
+  },
   // { field: "Edibility", width: 60 }, //always -300
   // { field: "Type" }, //always Seeds
   // { field: "Category" }, //always -74
   { field: "Description", flex: 1 },
   // { field: "Food" }, // blank
   // { field: "Buffs" }, // blank
-  { field: "GrowthDays", headerName: "GD", description: "Growth Days" },
   {
+    ...numberColumnProps,
+    field: "GrowthDays",
+    headerName: "Growth Days",
+    renderHeader: () => (
+      <Tooltip title="Growth Days">
+        <DateRangeOutlined />
+      </Tooltip>
+    ),
+  },
+  {
+    ...numberColumnProps,
     field: "ReGrowDays",
-    headerName: "RD",
-    description: "ReGrow Days",
+    headerName: "Regrowth Days",
     valueFormatter: ({ value: x }) => (x < 1 ? "-" : x),
+    renderHeader: () => (
+      <Tooltip title="Regrowth Days">
+        <EventRepeatOutlined />
+      </Tooltip>
+    ),
   },
   {
     field: "GrowthSeasons",
     headerName: "Seasons",
-    width: 120,
-    valueFormatter: ({ value: x }) =>
-      (x as string[])
+    width: 105,
+    valueGetter: (p) =>
+      (p.row.GrowthSeasons as string[])
         .map((s) => s.charAt(0).toUpperCase() + s.slice(1, 2))
         .join(","),
   },
@@ -80,25 +133,112 @@ const columns: GridColDef[] = [
   },
   // { field: "HarvestIncreasePerLevelMax" },// 10 for rice, 0 for everything else.
   // { field: "Seeds" }, //true for trellis else false
-  { field: "XP", headerName: "XP/H", description: "Experience per Harvest" },
-  { field: "Harvests", headerName: "H #", description: "Max Harvests" },
-  { field: "Quantity", headerName: "Qty", description: "Quantity" },
   {
+    ...numberColumnProps,
+    width: 65,
+    field: "XP",
+    headerName: "Exp. per Harvest",
+    renderHeader: () => (
+      <Tooltip title="Experience per Harvest">
+        <Box sx={{ alignItems: "center", display: "flex" }}>
+          <TipsAndUpdatesOutlined fontSize="small" />/
+          <AgricultureOutlined fontSize="small" />
+        </Box>
+      </Tooltip>
+    ),
+  },
+  {
+    ...numberColumnProps,
+    field: "Harvests",
+    headerName: "Max Harvests",
+    renderHeader: () => (
+      <Tooltip title="Max Harvests">
+        <AgricultureOutlined />
+      </Tooltip>
+    ),
+  },
+  {
+    ...numberColumnProps,
+    field: "XP*H",
+    headerName: "Max Exp.",
+    renderHeader: () => (
+      <Tooltip title="Max Experience">
+        <TipsAndUpdatesOutlined />
+      </Tooltip>
+    ),
+    valueGetter: ({ row: p }) => p.XP * p.Harvests,
+  },
+  {
+    ...numberColumnProps,
+    field: "Quantity",
+    renderHeader: () => (
+      <Tooltip title="Quantity">
+        <Numbers />
+      </Tooltip>
+    ),
+  },
+  {
+    ...numberColumnProps,
+    width: 65,
     field: "G/D",
-    description: "Profit per Day",
+    headerName: "Profit per Day",
+    renderHeader: () => (
+      <Tooltip title="Profit per Day">
+        <Box sx={{ alignItems: "center", display: "flex" }}>
+          <MonetizationOnOutlined fontSize="small" />/
+          <Brightness4Outlined fontSize="small" />
+        </Box>
+      </Tooltip>
+    ),
     valueGetter: ({ row: p }) =>
       (p.Sell * p.Quantity - p.Price) / p.TotalGrowthDays,
+    valueFormatter: (p) =>
+      p.value.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
   },
   {
+    ...numberColumnProps,
+    width: 65,
     field: "XP/D",
-    description: "Experience per Day",
+    description: "Exp. per Day",
+    renderHeader: () => (
+      <Tooltip title="Experience per Day">
+        <Box sx={{ alignItems: "center", display: "flex" }}>
+          <TipsAndUpdatesOutlined fontSize="small" />/
+          <Brightness4Outlined fontSize="small" />
+        </Box>
+      </Tooltip>
+    ),
     valueGetter: ({ row: p }) =>
       p.TotalGrowthDays <= 0 ? 0 : (p.XP * p.Harvests) / p.TotalGrowthDays,
+    // valueFormatter: (p) => round(p.value, 3),
+    valueFormatter: (p) =>
+      p.value.toLocaleString(undefined, {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      }),
   },
   {
+    ...numberColumnProps,
+    width: 65,
     field: "XP/G",
-    description: "Experience per Cost",
+    headerName: "Exp. per Cost",
+    renderHeader: () => (
+      <Tooltip title="Experience per Cost">
+        <Box sx={{ alignItems: "center", display: "flex" }}>
+          <TipsAndUpdatesOutlined fontSize="small" />/
+          <MonetizationOnOutlined fontSize="small" />
+        </Box>
+      </Tooltip>
+    ),
     valueGetter: ({ row: p }) => (p.XP * p.Harvests) / p.Price,
+    valueFormatter: (p) =>
+      p.value.toLocaleString(undefined, {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      }),
   },
 ];
 
@@ -284,10 +424,11 @@ export default function CropTable() {
                 ...columns,
                 columnVisibilityModel: {
                   Id: false,
+                  Harvest: false,
                   Description: false,
                   ExtraHarvestChance: false,
                   "Xtra #": false,
-                  "XP/G": false,
+                  // "XP/G": false,
                 },
               },
             }}
@@ -300,6 +441,12 @@ export default function CropTable() {
               toolbar: {
                 csvOptions: { disableToolbarButton: true },
                 printOptions: { disableToolbarButton: true },
+              },
+            }}
+            sx={{
+              borderColor: "action.disabled",
+              "& .MuiDataGrid-cell, .MuiDataGrid-columnHeaders": {
+                borderColor: "action.disabled",
               },
             }}
           />
