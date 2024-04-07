@@ -7,16 +7,7 @@ import SeasonSelect, { Season } from "./SeasonSelect";
 import { Autocomplete, Box, TextField, Tooltip } from "@mui/material";
 import ISeedSource from "../interface/ISeedSource";
 import "../style/style.css";
-import {
-  AgricultureOutlined,
-  Brightness4Outlined,
-  DateRangeOutlined,
-  EventRepeatOutlined,
-  MonetizationOnOutlined,
-  Numbers,
-  ShoppingBagOutlined,
-  TipsAndUpdatesOutlined,
-} from "@mui/icons-material";
+import { AgricultureOutlined, Brightness4Outlined, DateRangeOutlined, EventRepeatOutlined, MonetizationOnOutlined, Numbers, ShoppingBagOutlined, TipsAndUpdatesOutlined } from "@mui/icons-material";
 
 interface IRow {
   Id: number;
@@ -48,10 +39,7 @@ interface IRow {
   XP: number;
 }
 
-const numberColumnProps: Pick<
-  GridColDef,
-  "width" | "align" | "headerAlign" | "hideSortIcons" | "disableColumnMenu"
-> = {
+const numberColumnProps: Pick<GridColDef, "width" | "align" | "headerAlign" | "hideSortIcons" | "disableColumnMenu"> = {
   width: 0,
   align: "right",
   headerAlign: "right",
@@ -114,10 +102,7 @@ const columns: GridColDef[] = [
     field: "GrowthSeasons",
     headerName: "Seasons",
     width: 105,
-    valueGetter: (p) =>
-      (p.row.GrowthSeasons as string[])
-        .map((s) => s.charAt(0).toUpperCase() + s.slice(1, 2))
-        .join(","),
+    valueGetter: (p) => (p.row.GrowthSeasons as string[]).map((s) => s.charAt(0).toUpperCase() + s.slice(1, 2)).join(","),
   },
   // { field: "HarvestMethod" }, //1 for scythe else 0
   {
@@ -190,8 +175,7 @@ const columns: GridColDef[] = [
         </Box>
       </Tooltip>
     ),
-    valueGetter: ({ row: p }) =>
-      (p.Sell * p.Quantity - p.Price) / p.TotalGrowthDays,
+    valueGetter: ({ row: p }) => (p.Sell * p.Quantity - p.Price) / p.TotalGrowthDays,
     valueFormatter: (p) =>
       p.value.toLocaleString(undefined, {
         minimumFractionDigits: 2,
@@ -211,8 +195,7 @@ const columns: GridColDef[] = [
         </Box>
       </Tooltip>
     ),
-    valueGetter: ({ row: p }) =>
-      p.TotalGrowthDays <= 0 ? 0 : (p.XP * p.Harvests) / p.TotalGrowthDays,
+    valueGetter: ({ row: p }) => (p.TotalGrowthDays <= 0 ? 0 : (p.XP * p.Harvests) / p.TotalGrowthDays),
     // valueFormatter: (p) => round(p.value, 3),
     valueFormatter: (p) =>
       p.value.toLocaleString(undefined, {
@@ -248,9 +231,9 @@ const priceTypes: PriceType[] = ["Source", "Seed", "Seed Maker"];
 export default function CropTable() {
   const [crops, setCrops] = useState<ICrop[]>([]);
   const [objects, setObjects] = useState<IObject[]>([]);
-  const [season, setSeason] = useState<Season>("Spring");
-  const [price, setPrice] = useState<PriceType>("Source");
-  const [day, setDay] = useState<number>(1);
+  const [season, setSeason] = useState<Season>((localStorage.getItem("season") as Season) ?? "Spring");
+  const [price, setPrice] = useState<PriceType>((localStorage.getItem("price") as PriceType) ?? "Source");
+  const [day, setDay] = useState<number>((localStorage.getItem("day") as unknown as number) ?? 1);
   const [sources, setSources] = useState<ISeedSource[]>([]);
 
   const fetchSources = useCallback(async () => {
@@ -262,12 +245,8 @@ export default function CropTable() {
 
   useEffect(() => {
     (async () => {
-      const cropsPromise = stardewService
-        .getCrops()
-        .then((crops) => setCrops(crops));
-      const objectsPromise = stardewService
-        .getObjects()
-        .then((objects) => setObjects(objects));
+      const cropsPromise = stardewService.getCrops().then((crops) => setCrops(crops));
+      const objectsPromise = stardewService.getObjects().then((objects) => setObjects(objects));
       await cropsPromise;
       await objectsPromise;
     })();
@@ -275,11 +254,7 @@ export default function CropTable() {
 
   const rows: IRow[] = useMemo(() => {
     return crops
-      .filter(
-        (c) =>
-          season.toLowerCase() === "greenhouse" ||
-          c["Growth Seasons"].includes(season.toLowerCase())
-      )
+      .filter((c) => season.toLowerCase() === "greenhouse" || c["Growth Seasons"].includes(season.toLowerCase()))
       .map((c): IRow => {
         const o = objects.find((b) => b["Object Id"] === c["Object Id"]);
         const h = objects.find((b) => b["Object Id"] === c["Index Of Harvest"]);
@@ -290,10 +265,7 @@ export default function CropTable() {
             p = Number(o?.Price) ?? p;
             break;
           case "Seed Maker":
-            p =
-              o?.["Object Id"] === h?.["Object Id"]
-                ? Number(h?.Price) ?? p
-                : (s?.Sell ?? 0) / 2;
+            p = o?.["Object Id"] === h?.["Object Id"] ? Number(h?.Price) ?? p : (s?.Sell ?? 0) / 2;
         }
         return {
           ...c,
@@ -305,22 +277,17 @@ export default function CropTable() {
           Source: s?.Source ?? "",
           Sell: s?.Sell ?? 0,
           // Food: o?.["Food and Drink"] ?? "", //Blank
-          GrowthDays: [
-            c["Days in Stage 1 Growth"],
-            c["Days in Stage 2 Growth"],
-            c["Days in Stage 3 Growth"],
-            c["Days in Stage 4 Growth"],
-            c["Days in Stage 5 Growth"],
-          ].reduce((sum, d) => sum + Number(d), 0),
+          GrowthDays: [c["Days in Stage 1 Growth"], c["Days in Stage 2 Growth"], c["Days in Stage 3 Growth"], c["Days in Stage 4 Growth"], c["Days in Stage 5 Growth"]].reduce(
+            (sum, d) => sum + Number(d),
+            0
+          ),
           ReGrowDays: Number(c["Regrow After Harvest"]),
           GrowthSeasons: c["Growth Seasons"]?.split(" ") ?? [],
           HarvestMethod: Number(c["Harvest Method"]),
           ExtraHarvestChance: Number(c["Chance For Extra Crops"]),
           ExtraHarvestMin: Number(c["Min Extra Harvest"]),
           ExtraHarvestMax: Number(c["Max Extra Harvest"]),
-          HarvestIncreasePerLevelMax: Number(
-            c["Max Harvest Increase Per Farming Level"]
-          ),
+          HarvestIncreasePerLevelMax: Number(c["Max Harvest Increase Per Farming Level"]),
           // Seeds: Boolean(c["Raised Seeds"]),
           Seeds: c["Raised Seeds"],
           XP: Math.round(16 * Math.log(0.018 * Number(h?.Price ?? 0) + 1)),
@@ -378,6 +345,11 @@ export default function CropTable() {
       });
   }, [crops, objects, season, day, sources, price]);
 
+  const handleSeasonChange = (newSeason: Season) => {
+    localStorage.setItem("season", newSeason);
+    setSeason(newSeason);
+  };
+
   const handleDayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDay = Number(e.target.value);
     if (newDay < 1) {
@@ -388,25 +360,24 @@ export default function CropTable() {
       setDay(28);
       return;
     }
+    localStorage.setItem("day", newDay.toString());
     setDay(newDay);
+  };
+
+  const handlePriceChange = (newPrice: PriceType) => {
+    localStorage.setItem("price", newPrice);
+    setPrice(newPrice as PriceType);
   };
 
   return (
     <div className="container">
       <div style={{ display: "flex", margin: "15px 0px 5px", gap: "20px" }}>
-        <SeasonSelect season={season} onChange={(ns) => setSeason(ns)} />
-        <TextField
-          type="number"
-          size="small"
-          label="Day"
-          value={day}
-          onChange={handleDayChange}
-          sx={{ width: "100px" }}
-        />
+        <SeasonSelect season={season} onChange={handleSeasonChange} />
+        <TextField type="number" size="small" label="Day" value={day} onChange={handleDayChange} sx={{ width: "100px" }} />
         <Autocomplete
           value={price}
           onChange={(_e: any, newValue: PriceType | null) => {
-            setPrice(newValue ?? "Source");
+            handlePriceChange(newValue ?? "Source");
           }}
           options={priceTypes}
           sx={{ width: 200 }}
