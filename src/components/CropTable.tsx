@@ -371,7 +371,7 @@ export default function CropTable() {
 
   return (
     <div className="container">
-      <div style={{ display: "flex", margin: "15px 0px 5px", gap: "20px" }}>
+      <div className="filter">
         <SeasonSelect season={season} onChange={handleSeasonChange} />
         <TextField type="number" size="small" label="Day" value={day} onChange={handleDayChange} sx={{ width: "100px" }} />
         <Autocomplete
@@ -385,7 +385,7 @@ export default function CropTable() {
           size="small"
         />
       </div>
-      <div style={{ minHeight: 0, overflow: "auto" }}>
+      <div className="data-grid">
         {rows && (
           <DataGrid
             rows={rows}

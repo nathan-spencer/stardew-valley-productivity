@@ -1,4 +1,4 @@
-.container {
+.stardew-container {
   /* width: fit-content; */
   /* text-align: center; */
   background: #FAD08F;
@@ -15,4 +15,24 @@
   display: grid;
   grid-template-rows: auto 1fr;
   overflow: hidden;
+}
+
+.container {
+  padding: 8px;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.filter {
+  display: flex;
+  margin-top: 8px;
+  gap: 8px
+}
+
+.data-grid {
+  min-height: 0;
+  overflow: auto;
 }
