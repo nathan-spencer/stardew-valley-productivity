@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/stardew-valley-productivity/static/css/main.54043519.css",
-    "main.js": "/stardew-valley-productivity/static/js/main.cd1cdec0.js",
+    "main.css": "/stardew-valley-productivity/static/css/main.af7e5b47.css",
+    "main.js": "/stardew-valley-productivity/static/js/main.1d2da3f2.js",
     "static/js/787.179fc4e3.chunk.js": "/stardew-valley-productivity/static/js/787.179fc4e3.chunk.js",
     "index.html": "/stardew-valley-productivity/index.html",
-    "main.54043519.css.map": "/stardew-valley-productivity/static/css/main.54043519.css.map",
-    "main.cd1cdec0.js.map": "/stardew-valley-productivity/static/js/main.cd1cdec0.js.map",
+    "main.af7e5b47.css.map": "/stardew-valley-productivity/static/css/main.af7e5b47.css.map",
+    "main.1d2da3f2.js.map": "/stardew-valley-productivity/static/js/main.1d2da3f2.js.map",
     "787.179fc4e3.chunk.js.map": "/stardew-valley-productivity/static/js/787.179fc4e3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.54043519.css",
-    "static/js/main.cd1cdec0.js"
+    "static/css/main.af7e5b47.css",
+    "static/js/main.1d2da3f2.js"
   ]
 }
